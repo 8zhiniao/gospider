@@ -1,2 +1,2 @@
-# spidergo
-Go语言开发的爬虫项目
+# gospider
+go语言开发的爬虫项目
