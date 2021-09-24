@@ -3,11 +3,12 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/8zhiniao/gospider/fetcher"
-	"github.com/8zhiniao/gospider/zhenai/parse"
 	"golang.org/x/net/html/charset"
 	"golang.org/x/text/encoding"
+	"golang.org/x/text/transform"
 	"io"
+	"io/ioutil"
+	"net/http"
 	"regexp"
 
 	//"golang.org/x/text"
@@ -16,17 +17,34 @@ import (
 
 
 func main(){
-    url := "http://www.zhenai.com/zhenghun"
-	all, err := fetcher.Fetch(url)
-	if err != nil {
+	url1 := "http://www.zhenai.com/zhenghun"
+	//url2 := "http://www.baidu.com"
+	resp, err := http.Get(url1)
+	if err != nil{
 		panic(err)
 	}
-	//fmt.Printf("%s\n",all)
-	e := parse.ParseCity(all)
-	fmt.Printf("%v\n",e.Requests)
-	fmt.Printf("%v\n",e.Items)
-	fmt.Printf("%v",e)
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK{
+		fmt.Println("err")
+	}
+	//resp.Body
+	e := determineEncoding(resp.Body)
+	utf8Reader := transform.NewReader(resp.Body, e.NewDecoder())
 
+	all, err1 := ioutil.ReadAll(utf8Reader)
+	if err1 != nil {
+		panic(err)
+	}
+	//fmt.Printf("%s/n",all)
+	//decodeRune, _ := utf8.DecodeRune(all)
+
+	//fmt.Println(decodeRune)
+	//fmt.Println(string(all))
+
+	//re := regexp.MustCompile("<a target=\"_blank\" href=\"http://www.zhenai.com/zhenghun/chongqing\" data-v-f53df81a>重庆</a> ")
+	//allString := re.FindAllString(string(all),-1)
+	//fmt.Println(allString)
+	printSubCityAll(all)
 }
 
 func determineEncoding(r io.Reader) encoding.Encoding {
@@ -35,7 +53,7 @@ func determineEncoding(r io.Reader) encoding.Encoding {
 		panic(err)
 	}
 	e, _, _ := charset.DetermineEncoding(bytes, "")
-    return e
+	return e
 }
 
 /*
