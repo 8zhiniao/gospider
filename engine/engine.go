@@ -20,15 +20,19 @@ func Run(seed... Request){
 		//调用fetch去获取网页内容
 		body, err := fetcher.Fetch(r.Url)
 		if err != nil {
-			log.Printf("fetcher:error"+"fetcher")
+			log.Printf("fetcher:error"+"fetcher.url %s,%v",r.Url,err)
 			continue
 		}
 
+		//把requests加入到队列里面
 		parserResult := r.ParserFunc(body)
 		requests = append(requests,parserResult.Requests...)
-	}
-	    //for _,item := range requests{
 
-		//}
+		//对应的结果Items循环出来
+		for _,item := range parserResult.Items{
+			log.Printf("go get item %v",item)
+		}
+	}
+
 
 }
