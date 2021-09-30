@@ -23,7 +23,7 @@ func main(){
 	if err2 != nil {
 		panic(err2)
 	}
-
+    client.Do(request)
 
 	url1 := "https://album.zhenai.com/u/1446944988"
 	//url2 := "http://www.baidu.com"
